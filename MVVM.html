@@ -5,15 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>MVVM双向绑定</title>
+    <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 
 <body>
-    <script src="./js/Observer.js"></script>
-    <script src="./js/Watcher.js"></script>
-    <script src="./js/Compiler.js"></script>
-    <script src="./js/MVVM.js"></script>
-
     <div id="app">
         <input type="text" v-model="firstName">
         <input type="text" v-model="child.lastName">
@@ -25,15 +20,15 @@
         <button v-on:click="clickBtn">change model</button>
     </div>
     <script>
+
         let vm = new MVVM({
             el: '#app',
             data: {
-                firstName: 'hello',
+                firstName: ['hello','world'],
                 htmlStr: '<span style="color: #f00;">我是v-html指令的结果</span>',
                 child: {
                     lastName: ' World !'
                 }
-
             },
             methods: {
                 clickBtn: function (e) {
@@ -46,7 +41,8 @@
             console.log(arguments);
         });
 
-
+        
+        
         /* let options = {
              data: {
                  text: "hello"

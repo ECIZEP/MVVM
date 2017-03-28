@@ -1,17 +1,20 @@
-function Watcher(vm, expression, callback) {
-    this.callback = callback;
-    this.vm = vm;
-    // watch的数据属性
-    this.expression = expression;
-    this.callback = callback;
-    // watcher监听的属性的Id
-    this.depIds = {},
-        // 把值备份下，以便观察变化
-        this.oldValue = this.get();
-}
+import Dep from './dep'
 
-Watcher.prototype = {
-    update: function () {
+export default class Watcher {
+
+    constructor(vm, expression, callback) {
+        this.callback = callback;
+        this.vm = vm;
+        // watch的数据属性
+        this.expression = expression;
+        this.callback = callback;
+        // watcher监听的属性的Id
+        this.depIds = {};
+        // 把值备份下，以便缓冲变化
+        this.oldValue = this.get();
+    }
+
+    update () {
         var newValue = this.get();
         var oldValue = this.oldValue;
         if (newValue !== this.oldValue) {
@@ -20,26 +23,27 @@ Watcher.prototype = {
             // 执行回调更新视图
             this.callback.call(this.vm, newValue, oldValue);
         }
-    },
+    }
 
-    addDep: function (dep) {
+    addDep (dep) {
         if (!this.depIds.hasOwnProperty(dep.id)) {
             // 该属性的dep添加订阅者
             dep.addSub(this);
+            // 该属性的依赖列表
             this.depIds[dep.id] = dep;
         }
-    },
+    }
 
-    get: function () {
+    get () {
         Dep.target = this;
         // 求值的过程会触发监听数据的getter, 为了使之访问到watch
         var value = this.getVMVal();
         // 访问完了，置空
         Dep.target = null;
         return value;
-    },
+    }
 
-    getVMVal: function () {
+    getVMVal () {
         var expression = this.expression.split('.');
         var value = this.vm._data;
         expression.forEach(function (curVal) {
