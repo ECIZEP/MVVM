@@ -5,19 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <title>双向绑定</title>
 </head>
 
 <body>
+    <script src="./dist/js/main.bundle.js"></script>
+    <!--<script src="https://unpkg.com/vue/dist/vue.js"></script>-->
     <div id="app">
         <input type="text" v-model="firstName">
         <input type="text" v-model="child.lastName">
+        <p v-text="firstName.length"></p>
         <p>
             {{firstName}}
             <span v-text="child.lastName"></span>
         </p>
         <p v-html="htmlStr"></p>
         <button v-on:click="clickBtn">change model</button>
+        
     </div>
     <script>
 
@@ -36,28 +40,19 @@
                 }
             }
         });
+        
+        function change() {
+            vm.firstName[0] = "sdfsd";
+            vm.firstName.push("hahahaha");
+            console.log("dsf");
+        }
 
-        vm.$watch('child.lastName', function () {
+
+        /*vm.$watch('child.lastName', function () {
             console.log(arguments);
-        });
-
-        
-        
-        /* let options = {
-             data: {
-                 text: "hello"
-             }
-         }
-         var vm = new MVVM(options);
- 
-         // 初始化视图
-         app.textContent = options.data.text;
-         // 监听text的原始数据变化
-         new Watcher(vm, "text", function (newValue, oldValue) {
-             app.textContent = newValue;
-             console.log("更新视图：" + oldValue + "-->" + newValue);
-         });*/
+        });*/
     </script>
+    <button onclick="change()">sdf</button>
 </body>
 
 </html>

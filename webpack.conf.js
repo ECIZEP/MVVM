@@ -22,8 +22,8 @@ module.exports = {
                 }
             }
         ]
-    },
-    plugins: [
+    }
+/*    plugins: [
         new htmlWebpackPlugin({
             filename: 'index.html',
             template: 'MVVM.html',
@@ -33,6 +33,6 @@ module.exports = {
                 removeComments: true
             }
         }),
-    ]
+    ]*/
 
 }

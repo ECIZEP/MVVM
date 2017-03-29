@@ -27,7 +27,7 @@ export default class Watcher {
 
     addDep (dep) {
         if (!this.depIds.hasOwnProperty(dep.id)) {
-            // 该属性的dep添加订阅者
+            // 添加订阅者
             dep.addSub(this);
             // 该属性的依赖列表
             this.depIds[dep.id] = dep;
@@ -47,7 +47,7 @@ export default class Watcher {
         var expression = this.expression.split('.');
         var value = this.vm._data;
         expression.forEach(function (curVal) {
-            // 这里取值的过程，会调用到每一个数据的get，更具getter里面的闭包
+            // 这里取值的过程，会调用到每一个数据的get，根据getter里面的闭包
             // 从而访问到数据的dep,调用dep.depend
             // 属性dep.depend, 进一步调用到Watch的addDep，让watcher添加进去
             value = value[curVal];
