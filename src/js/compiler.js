@@ -210,7 +210,7 @@ const directiveUtil = {
         let fn = vm.$options.methods && vm.$options.methods[expression];
 
         if (eventType[1] && fn) {
-            node.addEventListener(eventType[1], fn, false);
+            node.addEventListener(eventType[1], fn.bind(vm), false);
         }
     },
 
