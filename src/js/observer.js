@@ -13,14 +13,18 @@ function copyAugment(target, src, keys) {
     }
 }
 
-export default class Observer {
+export default function observer(data) {
+    if (!data || typeof data !== 'object') {
+        return;
+    } else if (data.hasOwnProperty("__ob__") && data["__ob__"] instanceof Observer) {
+        return;
+    }
+    // 对象才能进
+    return new Observer(data);
+}
+
+class Observer {
     constructor(data) {
-        if (!data || typeof data !== 'object') {
-            return;
-        } else if (data.hasOwnProperty("__ob__")) {
-            return;
-        }
-        // ????
         this.dep = new Dep();
         // 给每个数据一个指向Observer的引用，array.js会用到
         def(data, "__ob__", this);
@@ -30,6 +34,7 @@ export default class Observer {
             const argment = data.__proto__ ? protoAugment : copyAugment;
             // 劫持数组方法
             argment(data, arrayMethods, Object.keys(arrayMethods));
+            // 对数组元素遍历下，有元素可能是对象
             this.observerArray(data);
         } else {
             this.walk(data);
@@ -46,8 +51,8 @@ export default class Observer {
 
     observerArray(items) {
         for (let i = 0; i < items.length; i++) {
-            // ????
-            new Observer(items[i]);
+            // 如果数组的元素是一个对象就监听，基本类型就不用监听了
+            observer(items[i]);
         }
     }
 
@@ -61,7 +66,7 @@ export default class Observer {
             return;
         }
 
-        new Observer(value);
+        let childObserver = observer(value);
 
         Object.defineProperty(data, key, {
             enumerable: true,
@@ -70,6 +75,9 @@ export default class Observer {
                 if (Dep.target) {
                     // 添加依赖
                     dep.depend();
+                    if (childObserver) {
+                        childObserver.dep.depend();
+                    }
                 }
                 return value;
             },
@@ -78,7 +86,7 @@ export default class Observer {
                     return;
                 }
                 if (typeof newValue === 'object') {
-                    new Observer(newValue);
+                    observer(newValue);
                 }
                 value = newValue;
                 // 告诉所有订阅者Watcher，数据更新了！

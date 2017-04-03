@@ -1,5 +1,5 @@
 import Watcher from './watcher'
-import Observer from './observer'
+import observer from './observer'
 import Compiler from './compiler'
 
 class MVVM {
@@ -12,7 +12,7 @@ class MVVM {
         Object.keys(this.$options.data).forEach(key => {
             this._proxy(key);
         });
-        new Observer(this._data);
+        observer(this._data);
 
         this.$compiler = new Compiler(options.el || document.body, this);
     }

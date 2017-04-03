@@ -1,5 +1,9 @@
 import Watcher from './watcher'
-import Observer from './observer'
+import observer from './observer'
+
+const tagRE = /\{\{\{(.*?)\}\}\}|\{\{(.*?)\}\}/g,
+      htmlRE = /^\{\{\{(.*)\}\}\}$/;
+
 
 // 实现指令系统
 // 目的： 替换模板中的指令，初始化值并且对这个值new一个订阅者watcher
@@ -38,7 +42,7 @@ export default class Compiler {
             if (self.isElementNode(node)) {
                 self.compileNodeAttr(node);
             } else if (self.isTextNode(node) && reg.test(text)) {
-                self.compileText(node, RegExp.$1.trim());
+                self.compileText(node);
             }
 
             if (node.childNodes && node.childNodes.length) {
@@ -55,7 +59,7 @@ export default class Compiler {
             let attrName = attr.name;
             if (self.isDirective(attrName)) {
                 // expression就是methods里面指定的时间响应函数
-                let expression = attr.value.trim();
+                let expression = attr.value;
                 // directicve就是事件的类型
                 let directive = attrName.substring(2);
                 // 事件指令
@@ -70,8 +74,66 @@ export default class Compiler {
         });
     }
 
-    compileText (node, expression) {
-        directiveUtil.text(node, this.$vm, expression);
+    compileText (node) {
+        const tokens = this.parseText(node.wholeText);
+        let fragment = document.createDocumentFragment();
+        tokens.forEach(token => {
+            let el;
+            if (token.tag) {
+                // html解析
+                if (token.html) {
+                    // html 解析 创建空文档
+                    el = document.createDocumentFragment();
+                    el.$parent = node.parentNode;
+                    el.$oncetime = true;
+                    directiveUtil.html(el, this.$vm, token.value);
+                } else {
+                    // 新的响应式文本节点
+                    el = document.createTextNode(" ");
+                    directiveUtil.text(el, this.$vm, token.value);
+                }
+            } else {
+                el = document.createTextNode(token.value);
+            }
+            el && fragment.appendChild(el);
+        });
+        node.parentNode.replaceChild(fragment, node);
+    }
+
+    parseText (text) {
+        
+        if (!tagRE.test(text)) {
+            return ;
+        }
+        const tokens = [];
+        let lastIndex = tagRE.lastIndex = 0;
+        let match,index,html,value;
+        while (match = tagRE.exec(text)) {
+            index = match.index;
+            // 先把{{}} 或者 {{{}}} 之前的文本提取
+            if (index > lastIndex) {
+                tokens.push({
+                    value: text.slice(lastIndex, index)
+                });
+            }
+            // 是按html解析还是按text解析
+            // 如果是文本 value存放文本信息，如果tag为true表示是一个节点，存放expression
+            html = htmlRE.test(match[0]);
+            value = html ? match[1] : match[2];
+            tokens.push({
+                value: value,
+                tag: true,
+                html: html
+            });
+            lastIndex = index + match[0].length;
+        }
+
+        if (lastIndex < text.length) {
+            tokens.push({
+                value: text.slice(lastIndex)
+            });
+        }
+        return tokens;
     }
 
     // 是不是vue指令
@@ -142,6 +204,7 @@ const directiveUtil = {
     },
 
     _getVMVal: function (vm, expression) {
+        expression = expression.trim();
         let value = vm._data;
         expression = expression.split('.');
         expression.forEach((key) => {
@@ -161,6 +224,7 @@ const directiveUtil = {
     },
 
     _setVMVal: function (vm, expression, value) {
+        expression = expression.trim();
         let data = vm._data;
         expression = expression.split('.');
         expression.forEach((key, index) => {
