@@ -13,7 +13,7 @@
     <!--<script src="https://unpkg.com/vue/dist/vue.js"></script>-->
     <div id="app">
         <input type="text" v-model="firstName">
-        <input type="text" v-model="child.lastName">
+        <input type="text" v-model="htmlStr">
         <p v-text="firstName"></p>
         <p>
             {{firstName}} sdf {{child.lastName}}
@@ -30,7 +30,7 @@
             el: '#app',
             data: {
                 firstName: "hello ",
-                htmlStr: '<span style="color: #f00;">我是v-html指令的结果</span>',
+                htmlStr: '<span style="color: #f00;">我是v-html指令的结果</span><span>sdf</spam>',
                 child: {
                     lastName: ' World !'
                 }

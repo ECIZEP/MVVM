@@ -37,7 +37,7 @@ export default class Compiler {
 
         [].slice.call(childNodes).forEach(function (node) {
             var text = node.textContent;
-            var reg = /\{\{(.*)\}\}/g
+            var reg = /\{\{(.*)\}\}/g;
 
             if (self.isElementNode(node)) {
                 self.compileNodeAttr(node);
@@ -87,6 +87,7 @@ export default class Compiler {
                     el.$parent = node.parentNode;
                     el.$oncetime = true;
                     directiveUtil.html(el, this.$vm, token.value);
+                    
                 } else {
                     // 新的响应式文本节点
                     el = document.createTextNode(" ");
@@ -178,7 +179,6 @@ const directiveUtil = {
                 return;
             } else {
                 this._setVMVal(vm, expression, event.target.value);
-                value = event.target.value;
             }
         }, false);
     },
@@ -237,13 +237,51 @@ const directiveUtil = {
     }
 }
 
+const cacheDiv = document.createElement('div');
+
 const updater = {
     textUpdater: function (node, value) {
         node.textContent = typeof value === 'undefined' ? '' : value;
     },
 
     htmlUpdater: function (node, value) {
-        node.innerHTML = typeof value === 'undefined' ? '' : value;
+        if (node.$parent) {
+            // {{{}}}html解析，传进来的node是一个空的fragment，得特殊处理
+            cacheDiv.innerHTML = value;
+            const childNodes = cacheDiv.childNodes,
+                  doms = [];
+            let len = childNodes.length,
+                tempNode;
+            if (node.$oncetime) {
+                while(len--) {
+                    tempNode = childNodes[0];
+                    node.appendChild(tempNode);
+                    doms.push(tempNode);
+                }
+                node.$doms = doms;
+                node.$oncetime = false;
+            } else {
+                // 使用fragment减少回流
+                let newFragment = document.createDocumentFragment();
+                while (len--) {
+                    tempNode = childNodes[0];
+                    newFragment.appendChild(tempNode);
+                    doms.push(tempNode);
+                }
+                // 插入新的节点
+                node.$parent.insertBefore(newFragment, node.$doms[0]);
+                // 删除原来的节点
+                node.$doms.forEach(childNode => {
+                    node.$parent.removeChild(childNode);
+                });
+                // 保存新节点引用，下次用来删除
+                node.$doms = doms; 
+            }
+
+        } else {
+            // v-html指令
+            node.innerHTML = typeof value === 'undefined' ? '' : value;        
+        }
     },
 
     classUpdater: function (node, value, oldValue) {
