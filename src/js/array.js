@@ -39,7 +39,6 @@ export const arrayMethods = Object.create(arrayProto);
         }
         if (inserted) ob.observerArray(inserted);
 
-        // ????
         console.log(ob.dep);
         ob.dep.notify();
         return result;

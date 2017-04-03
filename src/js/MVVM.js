@@ -8,7 +8,7 @@ class MVVM {
         this.$options = options;
         this._data = this.$options.data;
         var self = this;
-        // 数据代理 vm._data => vm.data 方便外界访问
+        // 数据代理 vm._data => vm.data 方便访问
         Object.keys(this.$options.data).forEach(key => {
             this._proxy(key);
         });

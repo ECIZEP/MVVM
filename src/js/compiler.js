@@ -174,11 +174,22 @@ const directiveUtil = {
 
         // 对于model做双向绑定
         let value = this._getVMVal(vm, expression);
+
+        // compositon是针对中文输入的优化
+        let composing = false;
+        
+        node.addEventListener('compositionstart', () => {
+            composing = true;
+        }, false);
+
+        node.addEventListener('compositionstart', () => {
+            composing = false;
+        }, false);
+
         node.addEventListener('input', event => {
-            if (value === event.target.value) {
-                return;
-            } else {
-                this._setVMVal(vm, expression, event.target.value);
+            if (!composing && value !== event.target.value) {
+                // 此处待优化，需要缓冲，否则体验很差
+                this._setVMVal(vm, expression, event.target.value);            
             }
         }, false);
     },

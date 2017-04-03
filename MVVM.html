@@ -16,12 +16,13 @@
         <input type="text" v-model="htmlStr">
         <p v-text="firstName"></p>
         <p>
-            {{firstName}} sdf {{child.lastName}}
+            {{firstName}}{{array.length}}
             {{{htmlStr}}}
             <span v-text="child.lastName"></span>
         </p>
         <p v-html="htmlStr"></p>
         <button v-on:click="clickBtn">change model</button>
+        <button v-on:click="addItem">数组增加长度</button>
         
     </div>
     <script>
@@ -33,20 +34,20 @@
                 htmlStr: '<span style="color: #f00;">我是v-html指令的结果</span><span>sdf</spam>',
                 child: {
                     lastName: ' World !'
-                }
+                },
+                array: ["sdf","sdfd"]
             },
             methods: {
                 clickBtn: function (e) {
                     alert("hello");
+                },
+                addItem: function () {
+                    vm.array.pop();
                 }
             }
         });
         
-        function change() {
-            vm.firstName[0] = "sdfsd";
-            vm.firstName.push("hahahaha");
-            console.log("dsf");
-        }
+
 
 
 
@@ -54,7 +55,7 @@
             console.log(arguments);
         });*/
     </script>
-    <button onclick="change()">sdf</button>
+    
 </body>
 
 </html>
