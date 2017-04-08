@@ -182,7 +182,7 @@ const directiveUtil = {
             composing = true;
         }, false);
 
-        node.addEventListener('compositionstart', () => {
+        node.addEventListener('compositionend', () => {
             composing = false;
         }, false);
 
