@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            border: 0px;
+        }
+        html,body {
+            width: 100%;
+            height: 100%;
+        }
+        .app {
+            background-image: url(../src/img/blueprint.png);
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <h1>todolist</h1>
+        </header>
+        <div class="content">
+            <input type="text" v-model="inputText" v-on:keyup="addTodo">
+            <ul>
+                <li v-for="item in array">{{item}}</li>
+            </ul>
+        </div>
+        <button v-on:click="change"></button>
+    </div>
+    <script src="../dist/js/main.bundle.js"></script>
+    
+    <script>
+        var vm = new MVVM({
+            el: '.app',
+            data: {
+                array: ["早睡", "早起"],
+                inputText: ""
+            },
+            methods: {
+                addTodo: function (event) {
+                    if (this.inputText !== '' && event.keyCode === 13) {
+                        this.array.push(this.inputText);
+                        this.inputText = '';
+                        console.log("dsf");
+                    }
+                },
+                change: function (value, index) {
+
+                }
+            }
+        });
+    </script>
+</body>
+</html>

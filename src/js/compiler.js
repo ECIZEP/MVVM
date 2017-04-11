@@ -1,8 +1,9 @@
 import Watcher from './watcher'
 import observer from './observer'
+import { computeExpression } from './util'
 
 const tagRE = /\{\{\{(.*?)\}\}\}|\{\{(.*?)\}\}/g,
-      htmlRE = /^\{\{\{(.*)\}\}\}$/;
+    htmlRE = /^\{\{\{(.*)\}\}\}$/;
 
 
 // 实现指令系统
@@ -20,7 +21,7 @@ export default class Compiler {
         }
     }
 
-    createFragment (el) {
+    createFragment(el) {
         var fragment = document.createDocumentFragment(),
             child;
 
@@ -31,7 +32,7 @@ export default class Compiler {
         return fragment;
     }
 
-    compileElement (el) {
+    compileElement(el) {
         let childNodes = el.childNodes,
             self = this;
 
@@ -44,26 +45,27 @@ export default class Compiler {
             } else if (self.isTextNode(node) && reg.test(text)) {
                 self.compileText(node);
             }
-
-            if (node.childNodes && node.childNodes.length) {
-                self.compileElement(node);
-            }
         });
     }
 
-    compileNodeAttr (node) {
+    compileNodeAttr(node) {
         let nodeAttrs = node.attributes,
-            self = this;
+            self = this,
+            lazyComplier,
+            lazyExp;
 
         [].slice.call(nodeAttrs).forEach(function (attr) {
             let attrName = attr.name;
             if (self.isDirective(attrName)) {
                 // expression就是methods里面指定的时间响应函数
                 let expression = attr.value;
-                // directicve就是事件的类型
+                // directicve
                 let directive = attrName.substring(2);
                 // 事件指令
-                if (self.isEventDirective(directive)) {
+                if (directive === 'for') {
+                    lazyComplier = directive;
+                    lazyExp = expression;
+                } else if (self.isEventDirective(directive)) {
                     directiveUtil.addEvent(node, self.$vm, directive, expression);
                 } else {
                     directiveUtil[directive] && directiveUtil[directive](node, self.$vm, expression);
@@ -72,9 +74,15 @@ export default class Compiler {
                 node.removeAttribute(attrName);
             }
         });
+
+        if (lazyComplier === 'for') {
+            directiveUtil[lazyComplier] && directiveUtil[lazyComplier](node, this.$vm, lazyExp);
+        } else if (node.childNodes && node.childNodes.length) {
+            self.compileElement(node);
+        }
     }
 
-    compileText (node) {
+    compileText(node) {
         const tokens = this.parseText(node.wholeText);
         let fragment = document.createDocumentFragment();
         tokens.forEach(token => {
@@ -87,7 +95,7 @@ export default class Compiler {
                     el.$parent = node.parentNode;
                     el.$oncetime = true;
                     directiveUtil.html(el, this.$vm, token.value);
-                    
+
                 } else {
                     // 新的响应式文本节点
                     el = document.createTextNode(" ");
@@ -101,14 +109,14 @@ export default class Compiler {
         node.parentNode.replaceChild(fragment, node);
     }
 
-    parseText (text) {
-        
+    parseText(text) {
+
         if (!tagRE.test(text)) {
-            return ;
+            return;
         }
         const tokens = [];
         let lastIndex = tagRE.lastIndex = 0;
-        let match,index,html,value;
+        let match, index, html, value;
         while (match = tagRE.exec(text)) {
             index = match.index;
             // 先把{{}} 或者 {{{}}} 之前的文本提取
@@ -138,19 +146,19 @@ export default class Compiler {
     }
 
     // 是不是vue指令
-    isDirective (attr) {
+    isDirective(attr) {
         return attr.indexOf('v-') === 0;
     }
 
-    isEventDirective (dir) {
+    isEventDirective(dir) {
         return dir.indexOf('on') === 0;
     }
 
-    isElementNode (node) {
+    isElementNode(node) {
         return node.nodeType === 1;
     }
 
-    isTextNode (node) {
+    isTextNode(node) {
         return node.nodeType === 3;
     }
 }
@@ -169,6 +177,35 @@ const directiveUtil = {
         this.bind(node, vm, expression, 'class');
     },
 
+    for: function (node, vm, expression) {
+        let itemName = expression.split('in')[0].replace(/\s/g, ''),
+            arrayName = expression.split('in')[1].replace(/\s/g, '').split('.'),
+            parentNode = node.parentNode,
+            startNode = document.createTextNode(''),
+            endNode = document.createTextNode(''),
+            range = document.createRange();
+
+        // 去掉原始模板
+        parentNode.replaceChild(endNode, node);
+        parentNode.insertBefore(startNode, endNode);
+        new Watcher(vm, arrayName + ".length", function (newValue, oldValue) {
+            let that = this;
+            range.setStart(startNode, 0);
+            range.setEnd(endNode, 0);
+            range.deleteContents();
+            this[arrayName].forEach(function (item, index) {
+                let cloneNode = node.cloneNode(true);
+                parentNode.insertBefore(cloneNode, endNode);
+                let forVm = Object.create(that);
+                forVm.$index = index;   // 增加$index下标
+                forVm[itemName] = item;  // 绑定item作用域
+                // 继续编译cloneNode
+                new Compiler(cloneNode, forVm);
+            });
+        });
+
+    },
+
     model: function (node, vm, expression) {
         this.bind(node, vm, expression, 'model');
 
@@ -177,7 +214,7 @@ const directiveUtil = {
 
         // compositon是针对中文输入的优化
         let composing = false;
-        
+
         node.addEventListener('compositionstart', () => {
             composing = true;
         }, false);
@@ -189,7 +226,7 @@ const directiveUtil = {
         node.addEventListener('input', event => {
             if (!composing && value !== event.target.value) {
                 // 此处待优化，需要缓冲，否则体验很差
-                this._setVMVal(vm, expression, event.target.value);            
+                this._setVMVal(vm, expression, event.target.value);
             }
         }, false);
     },
@@ -209,14 +246,18 @@ const directiveUtil = {
         let eventType = directive.split(':');
         let fn = vm.$options.methods && vm.$options.methods[expression];
 
-        if (eventType[1] && fn) {
+        if (eventType[1] && typeof fn === 'function') {
             node.addEventListener(eventType[1], fn.bind(vm), false);
+        } else {
+            node.addEventListener(eventType[1], function () {
+                computeExpression(vm, expression);
+            }, false);
         }
     },
 
     _getVMVal: function (vm, expression) {
         expression = expression.trim();
-        let value = vm._data;
+        let value = vm;
         expression = expression.split('.');
         expression.forEach((key) => {
             if (value.hasOwnProperty(key)) {
@@ -224,7 +265,7 @@ const directiveUtil = {
             } else {
                 throw new Error("can not find the property: " + key);
             }
-            
+
         });
 
         if (typeof value === 'object') {
@@ -260,11 +301,11 @@ const updater = {
             // {{{}}}html解析，传进来的node是一个空的fragment，得特殊处理
             cacheDiv.innerHTML = value;
             const childNodes = cacheDiv.childNodes,
-                  doms = [];
+                doms = [];
             let len = childNodes.length,
                 tempNode;
             if (node.$oncetime) {
-                while(len--) {
+                while (len--) {
                     tempNode = childNodes[0];
                     node.appendChild(tempNode);
                     doms.push(tempNode);
@@ -286,12 +327,12 @@ const updater = {
                     node.$parent.removeChild(childNode);
                 });
                 // 保存新节点引用，下次用来删除
-                node.$doms = doms; 
+                node.$doms = doms;
             }
 
         } else {
             // v-html指令
-            node.innerHTML = typeof value === 'undefined' ? '' : value;        
+            node.innerHTML = typeof value === 'undefined' ? '' : value;
         }
     },
 
@@ -304,5 +345,5 @@ const updater = {
 
     modelUpdater: function (node, value) {
         node.value = typeof value === 'undefined' ? '' : value;
-    }
+    },
 }

@@ -6,3 +6,13 @@ export function def(obj, key, value, enumerable) {
         enumerable: !!enumerable
     });
 }
+
+/*export function computeExpression(vm, exp) {
+    try {
+        with (vm) {
+            return eval(exp);
+        }
+    } catch (e) {
+        console.error('ERROR', e);
+    }
+}*/
