@@ -8,8 +8,6 @@
     <style>
         * {
             margin: 0px;
-            padding: 0px;
-            border: 0px;
         }
         html,body {
             width: 100%;
@@ -29,10 +27,10 @@
         <div class="content">
             <input type="text" v-model="inputText" v-on:keyup="addTodo">
             <ul>
-                <li v-for="item in array">{{item}}</li>
+                <li v-for="item in array" v-on:click="deleteItem(item)">{{item.title}}</li>
             </ul>
         </div>
-        <button v-on:click="change"></button>
+        <button v-on:click="change">排序</button>
     </div>
     <script src="../dist/js/main.bundle.js"></script>
     
@@ -40,19 +38,38 @@
         var vm = new MVVM({
             el: '.app',
             data: {
-                array: ["早睡", "早起"],
+                array: [
+                {
+                    title: "1",
+                    isFinished: false
+                },
+                {
+                    title: '2',
+                    isFinished: true
+                }],
                 inputText: ""
             },
             methods: {
                 addTodo: function (event) {
                     if (this.inputText !== '' && event.keyCode === 13) {
-                        this.array.push(this.inputText);
+                        this.array.push({
+                            title: this.inputText,
+                            isFinished: false
+                        });
                         this.inputText = '';
-                        console.log("dsf");
                     }
                 },
-                change: function (value, index) {
-
+                sort: function () {
+                    this.array.sort(function(a,b){return a.title > b.title});
+                    console.log(this.array);
+                    this.array.push('');
+                    this.array.pop('');
+                },
+                change: function () {
+                    this.array[0].title = "dfs";
+                },
+                deleteItem: function (item) {
+                    console.log("dfs")
                 }
             }
         });

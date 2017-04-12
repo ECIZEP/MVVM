@@ -6,8 +6,8 @@ export function def(obj, key, value, enumerable) {
         enumerable: !!enumerable
     });
 }
-
-/*export function computeExpression(vm, exp) {
+/*
+export function computeExpression(vm, exp) {
     try {
         with (vm) {
             return eval(exp);

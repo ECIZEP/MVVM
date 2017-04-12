@@ -15,8 +15,8 @@ export default class Watcher {
     }
 
     update () {
-        var newValue = this.get();
-        var oldValue = this.oldValue;
+        let newValue = this.get();
+        let oldValue = this.oldValue;
         if (newValue !== this.oldValue) {
             // 更新备份，准备下次对比
             this.oldValue = newValue;
@@ -37,15 +37,15 @@ export default class Watcher {
     get () {
         Dep.target = this;
         // 求值的过程会触发监听数据的getter, 为了使之访问到watch
-        var value = this.getVMVal();
+        let value = this.getVMVal();
         // 访问完了，置空
         Dep.target = null;
         return value;
     }
 
     getVMVal () {
-        var expression = this.expression.split('.');
-        var value = this.vm._data;
+        let expression = this.expression.split('.');
+        let value = this.vm;
         expression.forEach(function (curVal) {
             // 这里取值的过程，会调用到每一个数据的get，根据getter里面的闭包
             // 从而访问到数据的dep,调用dep.depend

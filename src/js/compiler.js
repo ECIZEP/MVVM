@@ -1,6 +1,6 @@
 import Watcher from './watcher'
 import observer from './observer'
-import { computeExpression } from './util'
+/*import { computeExpression } from './util'*/
 
 const tagRE = /\{\{\{(.*?)\}\}\}|\{\{(.*?)\}\}/g,
     htmlRE = /^\{\{\{(.*)\}\}\}$/;
@@ -188,17 +188,37 @@ const directiveUtil = {
         // 去掉原始模板
         parentNode.replaceChild(endNode, node);
         parentNode.insertBefore(startNode, endNode);
+
+        let value = vm;
+        arrayName.forEach(function (curVal) {
+            value = value[curVal];
+        });
+
+        value.forEach(function (item, index) {
+            let cloneNode = node.cloneNode(true);
+            parentNode.insertBefore(cloneNode, endNode);
+            let forVm = Object.create(vm);
+            // 增加$index下标
+            forVm.$index = index;
+            // 绑定item作用域
+            forVm[itemName] = item;
+            // 继续编译cloneNode
+            new Compiler(cloneNode, forVm);
+        });
+
         new Watcher(vm, arrayName + ".length", function (newValue, oldValue) {
             let that = this;
             range.setStart(startNode, 0);
             range.setEnd(endNode, 0);
             range.deleteContents();
-            this[arrayName].forEach(function (item, index) {
+            value.forEach(function (item, index) {             
                 let cloneNode = node.cloneNode(true);
                 parentNode.insertBefore(cloneNode, endNode);
                 let forVm = Object.create(that);
-                forVm.$index = index;   // 增加$index下标
-                forVm[itemName] = item;  // 绑定item作用域
+                // 增加$index下标
+                forVm.$index = index;
+                // 绑定item作用域
+                forVm[itemName] = item;
                 // 继续编译cloneNode
                 new Compiler(cloneNode, forVm);
             });
@@ -249,8 +269,9 @@ const directiveUtil = {
         if (eventType[1] && typeof fn === 'function') {
             node.addEventListener(eventType[1], fn.bind(vm), false);
         } else {
+            console.log(expression);
             node.addEventListener(eventType[1], function () {
-                computeExpression(vm, expression);
+
             }, false);
         }
     },
