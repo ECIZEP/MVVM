@@ -14,7 +14,6 @@ export const arrayMethods = Object.create(arrayProto);
 ].forEach(function(method) {
     // 缓存一份原始方法
     const original = arrayProto[method];
-    
     // 覆盖
     def(arrayMethods, method, function() {
         let i = arguments.length;

@@ -34,8 +34,6 @@ class MVVM {
             }
         });
     }
-
 }
-
 
 window.MVVM = MVVM;

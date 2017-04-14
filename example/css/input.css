@@ -1,0 +1,56 @@
+.todo-content {
+    width: 100%;
+    position: absolute;
+    transition: top 1s;
+    text-align: center;
+    font-weight: 600;
+}
+
+.move1 {
+    top:-40px;
+    opacity: 0;
+}
+
+.move2{
+    top:40px;
+    opacity: 1;
+}
+
+.move3 {
+    top:80px;
+    opacity: 0.7;
+}
+
+.move4{
+    top: 120px;
+    opacity: 0.3;
+}
+
+#todo-input {
+    font-size: 30px;
+    text-align: center;
+    width: 100%;
+    margin-top: -10px;
+    color: white;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 3px solid rgb(255, 255, 255);
+    border-left: 0;
+    outline: none;
+    background-color: transparent;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    font-size: 35px;
+    width: 500px;
+    height: 300px;
+    color: white;
+    align-items: center;
+}
+
+#todoList-container {
+    position: relative;
+    width: 100%;
+}

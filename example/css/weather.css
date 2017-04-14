@@ -1,0 +1,82 @@
+svg {
+  flex: 1;
+  fill: none;
+  stroke: white;
+  stroke-width: var(--sw);
+  stroke-linecap: round;
+}
+
+mask :nth-child(odd) {
+  fill: white;
+}
+mask :nth-child(2n) {
+  fill: black;
+  stroke: black;
+  stroke-width: calc(2*var(--sw));
+}
+
+[id='sun'] {
+  --i: -2;
+  mask: url(#m);
+}
+
+.osc, line {
+  animation: osc 2s ease-in-out infinite alternate;
+}
+
+line {
+  animation: exp 2s ease-in-out infinite alternate;
+}
+
+[id='raindrop'] {
+  animation: fall-clockwise 2s ease-in-out infinite;
+}
+
+[id='rays'] {
+  animation: rot 2s linear infinite;
+}
+
+
+/*上下晃动特效*/
+@keyframes osc {
+  to {
+    transform: translatey(calc(var(--i, 1)*var(--sw)));
+  }
+}
+/*旋转特效*/
+@keyframes rot {
+  to {
+    transform: rotate(var(--a));
+  }
+}
+/*变大*/
+@keyframes exp {
+  to {
+    transform: scalex(1.5);
+  }
+}
+/*下落特效*/
+@keyframes fall-clockwise {
+  0% {
+    -webkit-transform: translateY(-7px) scale(0.8);
+            transform: translateY(-7px) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    -webkit-transform: translateY(0px) translateX(4px) scale(0.7);
+            transform: translateY(0px) translateX(4px) scale(0.7);
+    opacity: 1;
+  }
+  45% {
+    -webkit-transform: translateY(7px) translateX(0px) scale(0.6);
+            transform: translateY(7px) translateX(0px) scale(0.6);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateY(14px) translateX(3px) scale(0.5);
+            transform: translateY(14px) translateX(3px) scale(0.5);
+  }
+}

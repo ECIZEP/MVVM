@@ -11,7 +11,7 @@
 <body>
     <script src="./dist/js/main.bundle.js"></script>
     <div id="app">
-       <!-- <input type="text" v-model="firstName">
+        <input type="text" v-model="firstName">
         <input type="text" v-model="htmlStr">
         <p v-text="firstName"></p>
         <p>
@@ -21,10 +21,10 @@
         </p>
         <p v-html="htmlStr"></p>
         <button v-on:click="clickBtn">change model</button>
-        <button v-on:click="addItem">数组增加长度</button>
+        <button v-on:click="addItem(firstName)">数组增加长度</button>
         <ul>
             <li v-for="item in array" class="list-item">{{item}}</li>
-        </ul>-->
+        </ul>
         <p>{{array.length}}</p>
         <button v-on:click="addItem">数组增加长度</button>
     </div>
@@ -32,19 +32,20 @@
         let vm = new MVVM({
             el: '#app',
             data: {
-                /*firstName: "hello ",
+                firstName: "hello ",
                 htmlStr: '<span style="color: #f00;">我是v-html指令的结果</span><span>sdf</spam>',
                 child: {
                     lastName: ' World !'
-                },*/
+                },
                 array: ["sdf","sdfd"]
             },
             methods: {
                 clickBtn: function (e) {
                     alert("hello");
                 },
-                addItem: function () {
-                    this.array.push("dfd");
+                addItem: function (value) {
+                    this.array.push(value);
+                    console.log(this.array);
                 }
             }
         });

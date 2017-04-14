@@ -1,9 +1,9 @@
 import Watcher from './watcher'
 import observer from './observer'
-/*import { computeExpression } from './util'*/
 
 const tagRE = /\{\{\{(.*?)\}\}\}|\{\{(.*?)\}\}/g,
-    htmlRE = /^\{\{\{(.*)\}\}\}$/;
+      htmlRE = /^\{\{\{(.*)\}\}\}$/,
+      paramsRE = /\((.+)\)/g;
 
 
 // 实现指令系统
@@ -194,6 +194,7 @@ const directiveUtil = {
             value = value[curVal];
         });
 
+        // 初始化
         value.forEach(function (item, index) {
             let cloneNode = node.cloneNode(true);
             parentNode.insertBefore(cloneNode, endNode);
@@ -211,7 +212,7 @@ const directiveUtil = {
             range.setStart(startNode, 0);
             range.setEnd(endNode, 0);
             range.deleteContents();
-            value.forEach(function (item, index) {             
+            value.forEach(function (item, index) {
                 let cloneNode = node.cloneNode(true);
                 parentNode.insertBefore(cloneNode, endNode);
                 let forVm = Object.create(that);
@@ -239,13 +240,16 @@ const directiveUtil = {
             composing = true;
         }, false);
 
-        node.addEventListener('compositionend', () => {
+        node.addEventListener('compositionend', event => {
             composing = false;
+            if (value !== event.target.value) {
+                this._setVMVal(vm, expression, event.target.value);
+            }
         }, false);
 
-        node.addEventListener('input', event => {
+        node.addEventListener('change', event => {
             if (!composing && value !== event.target.value) {
-                // 此处待优化，需要缓冲，否则体验很差
+                // 此处待优化，需要节流，否则体验很差
                 this._setVMVal(vm, expression, event.target.value);
             }
         }, false);
@@ -269,9 +273,19 @@ const directiveUtil = {
         if (eventType[1] && typeof fn === 'function') {
             node.addEventListener(eventType[1], fn.bind(vm), false);
         } else {
-            console.log(expression);
-            node.addEventListener(eventType[1], function () {
+            let match = paramsRE.exec(expression),
+                fnName = expression.replace(match[0], ''),
+                paramNames = match[1].split(','),
+                params = [];
 
+            paramsRE.exec("remove(todo)");
+            fn = vm.$options.methods[fnName];
+            for (let i = 0; i < paramNames.length; i++) {
+                let name = paramNames[i].trim();
+                params.push(vm[name]);
+            }
+            node.addEventListener(eventType[1], function () {
+                fn.apply(vm, params);
             }, false);
         }
     },
@@ -358,10 +372,12 @@ const updater = {
     },
 
     classUpdater: function (node, value, oldValue) {
-        let nodeNames = node.className;
-        nodeNames = nodeNames.replace(oldValue, '').replace(/\s$/, '');
-        let space = className && value ? ' ' : '';
-        node.className = className + space + value;
+        var nodeNames = node.className;
+        if (oldValue) {
+            nodeNames = nodeNames.replace(oldValue, '').replace(/\s$/, '');
+        }
+        var space = nodeNames && value ? ' ' : '';
+        node.className = nodeNames + space + value;
     },
 
     modelUpdater: function (node, value) {

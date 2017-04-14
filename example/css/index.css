@@ -1,0 +1,49 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+	margin:0px;
+	border: 0px;
+	padding: 0px;
+}
+
+.app, .wrapper {
+	width: 100%;
+    height: 100%;
+    display: flex;
+    margin: 0;
+    background-image: url(../img/04.jpg);
+    background-repeat: no-repeat;
+    -moz-background-size: 100% 100%;
+    background-size: 100% 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+#weather {
+	float: right;
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	right: 20px;
+	top: 0;
+	color: white;
+	text-align: center;
+}
+
+#timeline-container {
+	position: absolute;
+	height: 100%;
+	overflow-y: auto; 
+	top: 0;
+	max-width: 300px;
+	transition: left 1s ease;
+}
+
+.timeline-container-hide {
+	left: -300px;
+}
+
+.timeline-container-show {
+	left: 0;
+}
