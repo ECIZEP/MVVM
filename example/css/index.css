@@ -47,3 +47,262 @@ body {
 .timeline-container-show {
 	left: 0;
 }
+
+
+/*input css*/
+
+.todo-content {
+    width: 100%;
+    position: absolute;
+    transition: top 1s;
+    text-align: center;
+    font-weight: 600;
+}
+
+.move1 {
+    top:-40px;
+    opacity: 0;
+}
+
+.move2{
+    top:40px;
+    opacity: 1;
+}
+
+.move3 {
+    top:80px;
+    opacity: 0.7;
+}
+
+.move4{
+    top: 120px;
+    opacity: 0.3;
+}
+
+#todo-input {
+    font-size: 30px;
+    text-align: center;
+    width: 100%;
+    margin-top: -10px;
+    color: white;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 3px solid rgb(255, 255, 255);
+    border-left: 0;
+    outline: none;
+    background-color: transparent;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    font-size: 35px;
+    width: 500px;
+    height: 300px;
+    color: white;
+    align-items: center;
+}
+
+#todoList-container {
+    position: relative;
+    width: 100%;
+}
+
+/*list css*/
+.todo-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.todo-list li {
+  position: relative;
+  font-size: 24px;
+}
+
+.todo-list li .view {
+  min-height: 40px;
+}
+
+.todo-list li:last-child {
+  border-bottom: none;
+}
+
+.todo-list li .toggle {
+  text-align: center;
+  width: 40px;
+  /* auto, since non-WebKit browsers doesn't support input styling */
+  height: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  border: none;
+  /* Mobile Safari */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.todo-list li .toggle:after {
+  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#ededed" stroke-width="3"/></svg>');
+}
+
+.todo-list li label {
+  white-space: pre-line;
+  word-break: break-all;
+  padding: 5px 60px 5px 15px;
+  margin-left: 45px;
+  font-size: 16px;
+  display: block;
+  line-height: 1.2;
+  transition: color 0.4s;
+  color:white;
+}
+
+.todo-list li.completed label {
+  color: #d9d9d9;
+  text-decoration: line-through;
+}
+
+.todo-list li .destroy {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 10px;
+  height: 40px;
+  margin: auto 0;
+  font-size: 30px;
+  color: #cc9a9a;
+  margin-bottom: 11px;
+  transition: color 0.2s ease-out;
+}
+
+.todo-list li .destroy:hover {
+  color: #af5b5e;
+}
+
+.todo-list li .destroy:after {
+  content: 'x';
+}
+
+.todo-list li:hover .destroy {
+  display: block;
+}
+
+.todo-list li .edit {
+  display: none;
+}
+
+.todo-list li.editing:last-child {
+  margin-bottom: -1px;
+}
+
+.view.completed .toggle:after {
+  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
+}
+
+.view.completed label {
+  color: #d9d9d9;
+  text-decoration: line-through;
+}
+
+.todo-list li.editing {
+  border-bottom: none;
+  padding: 0;
+}
+
+.todo-list .editing.edit {
+  display: block;
+  width: 506px;
+  padding: 13px 17px 12px 17px;
+  margin: 0 0 0 43px;
+}
+
+.todo-list .editing.view {
+  display: none;
+}
+
+/*weather css*/
+
+svg {
+  flex: 1;
+  fill: none;
+  stroke: white;
+  stroke-width: var(--sw);
+  stroke-linecap: round;
+}
+
+mask :nth-child(odd) {
+  fill: white;
+}
+mask :nth-child(2n) {
+  fill: black;
+  stroke: black;
+  stroke-width: calc(2*var(--sw));
+}
+
+[id='sun'] {
+  --i: -2;
+  mask: url(#m);
+}
+
+.osc, line {
+  animation: osc 2s ease-in-out infinite alternate;
+}
+
+line {
+  animation: exp 2s ease-in-out infinite alternate;
+}
+
+[id='raindrop'] {
+  animation: fall-clockwise 2s ease-in-out infinite;
+}
+
+[id='rays'] {
+  animation: rot 2s linear infinite;
+}
+
+
+/*上下晃动特效*/
+@keyframes osc {
+  to {
+    transform: translatey(calc(var(--i, 1)*var(--sw)));
+  }
+}
+/*旋转特效*/
+@keyframes rot {
+  to {
+    transform: rotate(var(--a));
+  }
+}
+/*变大*/
+@keyframes exp {
+  to {
+    transform: scalex(1.5);
+  }
+}
+/*下落特效*/
+@keyframes fall-clockwise {
+  0% {
+    -webkit-transform: translateY(-7px) scale(0.8);
+            transform: translateY(-7px) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    -webkit-transform: translateY(0px) translateX(4px) scale(0.7);
+            transform: translateY(0px) translateX(4px) scale(0.7);
+    opacity: 1;
+  }
+  45% {
+    -webkit-transform: translateY(7px) translateX(0px) scale(0.6);
+            transform: translateY(7px) translateX(0px) scale(0.6);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateY(14px) translateX(3px) scale(0.5);
+            transform: translateY(14px) translateX(3px) scale(0.5);
+  }
+}

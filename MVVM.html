@@ -20,13 +20,13 @@
             <span v-text="child.lastName"></span>
         </p>
         <p v-html="htmlStr"></p>
-        <button v-on:click="clickBtn">change model</button>
+        <button v-on:click="clickBtn">改变数组内容</button>
         <button v-on:click="addItem(firstName)">数组增加长度</button>
         <ul>
             <li v-for="item in array" class="list-item">{{item}}</li>
         </ul>
         <p>{{array.length}}</p>
-        <button v-on:click="addItem">数组增加长度</button>
+       
     </div>
     <script>
         let vm = new MVVM({
@@ -41,7 +41,7 @@
             },
             methods: {
                 clickBtn: function (e) {
-                    alert("hello");
+                    this.array[0] = "dfsdf";
                 },
                 addItem: function (value) {
                     this.array.push(value);
@@ -49,14 +49,6 @@
                 }
             }
         });
-        
-
-
-
-
-        /*vm.$watch('child.lastName', function () {
-            console.log(arguments);
-        });*/
     </script>
     
 </body>

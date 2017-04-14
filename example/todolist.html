@@ -5,20 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <link rel="stylesheet" type="text/css" href="./css/input.css" />
-    <link rel="stylesheet" type="text/css" href="./css/list.css" />
+    <title>TodoList</title>
     <link rel="stylesheet" type="text/css" href="./css/index.css" />
-    <link rel="stylesheet" type="text/css" href="./css/weather.css" />
+
 </head>
 
 <body>
     <div class="app">
-        <!--v-on:mousemove="showDrawer"-->
-		<div class="wrapper" >
+		<div class="wrapper" v-on:mousemove="showDrawer">
 			<div id="weather"></div>
 			<div class="input-container">
-				<h2 v-html="title"></h2>
+				<h2 v-text="title"></h2>
 				<input type="text" id="todo-input" v-model="inputText" v-on:keyup="addInput">
 				<div id="todoList-container">
 					<div class="todo-content move1"></div>
@@ -27,11 +24,11 @@
 					<div class="todo-content move1"></div>
 				</div>
 			</div>
-			<div id="timeline-container" class="timeline-container-show">
+			<div id="timeline-container" class="timeline-container-hide">
 				<ul class="todo-list">
 					<li class="todo" v-for="todo in todolist">
 						<div v-class="todo.className">
-							<span class="toggle" v-on:click="finishItem(todo)"></span>
+							<span class="toggle" v-on:click="finishItem(todo, '测试')"></span>
 							<label>{{todo.title}}</label>
 							<span class="destroy" v-on:click="remove(todo)"></span>
 						</div>
@@ -127,7 +124,8 @@
                         this.todolist.splice(index, 1);
                     }
                 },
-                finishItem: function (todo) {
+                finishItem: function (todo, string) {
+                    string ? console.log(string) : void 666;
                     if (todo.isFinished) {
                         todo.isFinished = false;
                         todo.className = 'view';

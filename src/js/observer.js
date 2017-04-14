@@ -51,7 +51,7 @@ class Observer {
 
     observerArray(items) {
         for (let i = 0; i < items.length; i++) {
-            // 如果数组的元素是一个对象就监听，基本类型就不用监听了
+            // 数组的元素是对象就监听
             observer(items[i]);
         }
     }

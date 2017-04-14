@@ -1,9 +1,10 @@
-import Watcher from './watcher'
-import observer from './observer'
+import Watcher from './watcher';
+import observer from './observer';
 
 const tagRE = /\{\{\{(.*?)\}\}\}|\{\{(.*?)\}\}/g,
-      htmlRE = /^\{\{\{(.*)\}\}\}$/,
-      paramsRE = /\((.+)\)/g;
+    htmlRE = /^\{\{\{(.*)\}\}\}$/,
+    paramsRE = /\((.+)\)/g,
+    stringRE = /\'(.*)\'/g;
 
 
 // 实现指令系统
@@ -61,11 +62,12 @@ export default class Compiler {
                 let expression = attr.value;
                 // directicve
                 let directive = attrName.substring(2);
-                // 事件指令
                 if (directive === 'for') {
+                    // for指令懒编译
                     lazyComplier = directive;
                     lazyExp = expression;
                 } else if (self.isEventDirective(directive)) {
+                    // 事件指令
                     directiveUtil.addEvent(node, self.$vm, directive, expression);
                 } else {
                     directiveUtil[directive] && directiveUtil[directive](node, self.$vm, expression);
@@ -208,14 +210,13 @@ const directiveUtil = {
         });
 
         new Watcher(vm, arrayName + ".length", function (newValue, oldValue) {
-            let that = this;
             range.setStart(startNode, 0);
             range.setEnd(endNode, 0);
             range.deleteContents();
-            value.forEach(function (item, index) {
+            value.forEach((item, index) => {
                 let cloneNode = node.cloneNode(true);
                 parentNode.insertBefore(cloneNode, endNode);
-                let forVm = Object.create(that);
+                let forVm = Object.create(this);
                 // 增加$index下标
                 forVm.$index = index;
                 // 绑定item作用域
@@ -247,9 +248,8 @@ const directiveUtil = {
             }
         }, false);
 
-        node.addEventListener('change', event => {
+        node.addEventListener('input', event => {
             if (!composing && value !== event.target.value) {
-                // 此处待优化，需要节流，否则体验很差
                 this._setVMVal(vm, expression, event.target.value);
             }
         }, false);
@@ -273,6 +273,17 @@ const directiveUtil = {
         if (eventType[1] && typeof fn === 'function') {
             node.addEventListener(eventType[1], fn.bind(vm), false);
         } else {
+            /*
+            function computeExpression(exp, vm) {
+                try {
+                    with (vm) {
+                        return eval(exp);
+                    }
+                } catch (e) {
+                    console.error('ERROR', e);
+                }
+            }
+            */
             let match = paramsRE.exec(expression),
                 fnName = expression.replace(match[0], ''),
                 paramNames = match[1].split(','),
@@ -280,9 +291,18 @@ const directiveUtil = {
 
             paramsRE.exec("remove(todo)");
             fn = vm.$options.methods[fnName];
+            // 矫正参数
             for (let i = 0; i < paramNames.length; i++) {
-                let name = paramNames[i].trim();
-                params.push(vm[name]);
+                let name = paramNames[i].trim(),
+                    stringMatch = stringRE.exec(name);
+                if (stringMatch) {
+                    // 字符串常量
+                    params.push(stringMatch[1]);
+                } else {
+                    // vm中变量
+                    params.push(vm[name]);
+                }
+                
             }
             node.addEventListener(eventType[1], function () {
                 fn.apply(vm, params);
