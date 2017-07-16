@@ -193,16 +193,17 @@ const directiveUtil = {
 
         let value = vm;
         arrayName.forEach(function (curVal) {
-            value = value[curVal];
+            value = value[curVal] ? value[curVal] : void 666;
+            if (!value) {
+                throw new Error("wrong expression");
+            }
         });
 
         // 初始化
-        value.forEach(function (item, index) {
+        value.forEach((item, index) => {
             let cloneNode = node.cloneNode(true);
             parentNode.insertBefore(cloneNode, endNode);
             let forVm = Object.create(vm);
-            // 增加$index下标
-            forVm.$index = index;
             // 绑定item作用域
             forVm[itemName] = item;
             // 继续编译cloneNode
@@ -217,8 +218,6 @@ const directiveUtil = {
                 let cloneNode = node.cloneNode(true);
                 parentNode.insertBefore(cloneNode, endNode);
                 let forVm = Object.create(this);
-                // 增加$index下标
-                forVm.$index = index;
                 // 绑定item作用域
                 forVm[itemName] = item;
                 // 继续编译cloneNode
@@ -248,7 +247,7 @@ const directiveUtil = {
             }
         }, false);
 
-        node.addEventListener('input', event => {
+        node.addEventListener('keyup', event => {
             if (!composing && value !== event.target.value) {
                 this._setVMVal(vm, expression, event.target.value);
             }

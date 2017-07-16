@@ -7,11 +7,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>TodoList</title>
     <link rel="stylesheet" type="text/css" href="./css/index.css" />
-
 </head>
 
 <body>
     <div class="app">
+        <!--un-on:mousemove="showDrawer"-->
 		<div class="wrapper" v-on:mousemove="showDrawer">
 			<div id="weather"></div>
 			<div class="input-container">
@@ -24,7 +24,7 @@
 					<div class="todo-content move1"></div>
 				</div>
 			</div>
-			<div id="timeline-container" class="timeline-container-hide">
+			<div id="timeline-container" class="timeline-container-show">
 				<ul class="todo-list">
 					<li class="todo" v-for="todo in todolist">
 						<div v-class="todo.className">
@@ -46,41 +46,32 @@
                 title: "what to do next ?",
                 todolist: [
                     {
-                        title: "爱睡懒觉凯迪拉克加福禄寿",
+                        title: "热烈欢迎贺师俊老师",
                         isFinished: false,
                         className: 'view'
                     },
                     {
-                        title: '啥地方撒发送到',
+                        title: '为人民服雾',
                         isFinished: true,
                         className: 'view completed'
                     },
                     {
-                        title: "爱睡懒觉凯迪拉克加福禄寿",
+                        title: "瓜瓜老师最漂亮",
                         isFinished: false,
                         className: 'view'
                     },
                     {
-                        title: '啥地方撒发送到',
+                        title: '360前端星计划答辩',
                         isFinished: true,
                         className: 'view completed'
                     },
                     {
-                        title: "爱睡懒觉凯迪拉克加福禄寿",
+                        title: "今天要早起呀，今天要早起呀",
                         isFinished: false,
                         className: 'view'
                     },
                     {
-                        title: '啥地方撒发送到',
-                        isFinished: true,
-                        className: 'view completed'
-                    },{
-                        title: "爱睡懒觉凯迪拉克加福禄寿",
-                        isFinished: false,
-                        className: 'view'
-                    },
-                    {
-                        title: '啥地方撒发送到',
+                        title: '吃饭睡觉coding',
                         isFinished: true,
                         className: 'view completed'
                     }

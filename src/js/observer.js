@@ -43,9 +43,8 @@ class Observer {
     }
 
     walk(data) {
-        let self = this;
-        Object.keys(this.data).forEach(function (key) {
-            self.defineReactice(data, key, data[key]);
+        Object.keys(this.data).forEach( key => {
+            this.defineReactice(data, key, data[key]);
         });
     }
 
